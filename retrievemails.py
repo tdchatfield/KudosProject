@@ -11,13 +11,15 @@ processed_mails = []
 
 
 def extract_email(string, start="<", stop=">"):
-    '''Function to search between "<" and ">" for emails.'''
+    """Function to search between "<" and ">" for emails.
+    """
     return string[string.index(start) + 1:string.index(stop)]
 
 
 def stripchars(mail):
-    ''' For loop which strips "<", ">", and ","
-    from the "TO", "FROM", and "DATE" fields respectively.'''
+    """For loop which strips "<", ">", and ","
+    from the "TO", "FROM", and "DATE" fields respectively.
+    """
     if '<' in mail['TO']:
         mail['TO'] = extract_email(mail['TO'])
     if '<' in mail['FROM']:
@@ -27,8 +29,9 @@ def stripchars(mail):
 
 
 def get_mail_uids(my_imap):
-    ''' This function retrieves emails from selected mailbox
-    and stores them in a list'''
+    """This function retrieves emails from selected mailbox
+    and stores them in a list
+    """
     result, data = my_imap.uid('search', None, conf.MODE)
 
     if result != 'OK':
@@ -40,10 +43,11 @@ def get_mail_uids(my_imap):
 
 
 def process_mails():
-    '''This function iterates through the raw emails
+    """This function iterates through the raw emails
     stored in retrieved_raw_mails and extracts the header information,
     the plaintext body of the email, and stores this data
-    in a dictionary if certain criteria are met. '''
+    in a dictionary if certain criteria are met.
+    """
     for mail_unprocessed in retrieved_raw_mails:
 
         mail_unprocessed = email.message_from_bytes(mail_unprocessed)
@@ -84,7 +88,7 @@ except imaplib.IMAP4.error:
 
 # Check if **no** mails have been retrieved from google mail.
 if not mail_uids_list:
-    print("No new emails found, script exiting now.")
+    print("No emails found, script exiting now.")
     exit()
 
 else:

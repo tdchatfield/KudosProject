@@ -4,10 +4,6 @@ import configfile as conf
 # If mails have been retrieved, establish connection to MySQL database:
 
 
-def timedateforinsert(maiL_date)
-    for
-
-
 def mysqlinserts(processed_mails):
     '''Takes values from a dictionary and inserts into specified database.'''
     try:

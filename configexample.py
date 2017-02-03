@@ -11,4 +11,4 @@ DB_SCHEMA = ''
 
 # Toggle unseen/all
 # Set 'ALL' or 'UNSEEN' to retrieve all mails that match criteria.
-MODE = 'UNSEEN'
+MODE = ''
