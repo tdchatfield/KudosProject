@@ -35,7 +35,8 @@ def get_mail_uids(my_imap):
     result, data = my_imap.uid('search', None, conf.MODE)
 
     if result != 'OK':
-        raise "failure to retrieve emails"
+        print("failure to retrieve emails")
+        return False
 
     for num in data[0].split():
         mail_uids_list.append(num)
@@ -81,12 +82,14 @@ try:
     get_mail_uids(my_imap)
 
 except imaplib.IMAP4.error:
-    raise "IMAP Error, exiting script now..."
+    print("IMAP Error, exiting script now...")
+    exit()
 
 
 # Check if **no** mails have been retrieved from google mail.
 if not mail_uids_list:
-    raise "No emails found, script exiting now."
+    print("No emails found, script exiting now.")
+    exit()
 
 else:
     # retrieve raw emails for each uid and append to retrieved_raw_mails
