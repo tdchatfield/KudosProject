@@ -35,7 +35,7 @@ def get_mail_uids(my_imap):
     result, data = my_imap.uid('search', None, conf.MODE)
 
     if result != 'OK':
-        print("failure to retrieve emails")
+        print('\nfailure to retrieve emails\n')
         return False
 
     for num in data[0].split():
@@ -59,7 +59,7 @@ def process_mails():
             if part.get_content_type() == 'text/plain':
                 mail_body = part.get_payload()
 
-        if mail_cc:
+        if mail_cc and (mail_cc != mail_from):
             mail =\
                 {
                     'FROM': mail_from,
@@ -72,23 +72,19 @@ def process_mails():
 
 
 # IMAP connection is defined and established here
-try:
-    my_imap = imaplib.IMAP4_SSL('imap.gmail.com')
-    my_imap.login(conf.MY_ACCOUNT, conf.MY_PASS)
 
-    # Mailbox is selected here
-    my_imap.select(conf.MY_MAILBOX)
-    # get mail UIDs
-    get_mail_uids(my_imap)
+my_imap = imaplib.IMAP4_SSL('imap.gmail.com')
+my_imap.login(conf.MY_ACCOUNT, conf.MY_PASS)
 
-except imaplib.IMAP4.error:
-    print("IMAP Error, exiting script now...")
-    exit()
+# Mailbox is selected here
+my_imap.select(conf.MY_MAILBOX)
+# get mail UIDs
+get_mail_uids(my_imap)
 
 
 # Check if **no** mails have been retrieved from google mail.
 if not mail_uids_list:
-    print("No emails found, script exiting now.")
+    print('\nNo emails found, script exiting now.\n')
     exit()
 
 else:

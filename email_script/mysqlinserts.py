@@ -15,20 +15,14 @@ def mysqlinserts(processed_mails):
 
         for mail in processed_mails:
 
-            insert_query = '''INSERT INTO kudos_staging
+            vals_to_insert = mail['FROM'], mail['TO'], mail['REASON'], mail['DATE']
+
+            cursor.execute('''INSERT INTO kudos_staging
                 (kudos_from, kudos_to, kudos_reason, kudos_date)
-                VALUES('{}','{}','{}','{}')'''
-
-            insert_query = insert_query.format(
-                mail['FROM'],
-                mail['TO'],
-                mail['REASON'],
-                mail['DATE'])
-
-            cursor.execute(insert_query)
+                VALUES(%s, %s, %s, %s)
+                ''', vals_to_insert)
             dbconn.commit()
-
-        dbconn.close()
+            print("record commited!")
 
     except pymysql.ProgrammingError as e:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
