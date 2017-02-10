@@ -55,6 +55,7 @@ def process_mails():
         mail_from = mail_unprocessed['from']
         mail_cc = mail_unprocessed['cc']
         mail_date = mail_unprocessed['Date']
+
         for part in mail_unprocessed.walk():
             if part.get_content_type() == 'text/plain':
                 mail_body = part.get_payload()
@@ -78,6 +79,7 @@ my_imap.login(conf.MY_ACCOUNT, conf.MY_PASS)
 
 # Mailbox is selected here
 my_imap.select(conf.MY_MAILBOX)
+
 # get mail UIDs
 get_mail_uids(my_imap)
 
