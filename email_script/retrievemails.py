@@ -1,31 +1,13 @@
 import imaplib
 import email
-import mysqlinserts
 
+import mysqlinserts
 import configfile as conf
 
 # Creating lists
 mail_uids_list = []
 retrieved_raw_mails = []
 processed_mails = []
-
-
-def extract_email(string, start="<", stop=">"):
-    """Function to search between "<" and ">" for emails.
-    """
-    return string[string.index(start) + 1:string.index(stop)]
-
-
-def stripchars(mail):
-    """For loop which strips "<", ">", and ","
-    from the "TO", "FROM", and "DATE" fields respectively.
-    """
-    if '<' in mail['TO']:
-        mail['TO'] = extract_email(mail['TO'])
-    if '<' in mail['FROM']:
-        mail['FROM'] = extract_email(mail['FROM'])
-    if ',' in mail['DATE']:
-        mail['DATE'] = mail['DATE'].replace('.', '')
 
 
 def get_mail_uids(my_imap):
@@ -52,22 +34,21 @@ def process_mails():
 
         mail_unprocessed = email.message_from_bytes(mail_unprocessed)
 
-        mail_from = mail_unprocessed['from']
-        mail_cc = mail_unprocessed['cc']
-        mail_date = mail_unprocessed['Date']
+        mail_from = mail_unprocessed['FROM']
+        mail_date = mail_unprocessed['DATE']
+        mail_cc = mail_unprocessed['CC']
 
         for part in mail_unprocessed.walk():
             if part.get_content_type() == 'text/plain':
                 mail_body = part.get_payload()
 
-        if mail_cc and (mail_cc != mail_from):
-            mail =\
-                {
-                    'FROM': mail_from,
-                    'REASON': mail_body,
-                    'TO': mail_cc,
-                    'DATE': mail_date
-                }
+        if mail_cc:
+            mail = {
+                'FROM': mail_from,
+                'REASON': mail_body,
+                'TO': mail_cc,
+                'DATE': mail_date
+            }
 
             processed_mails.append(mail)
 
@@ -80,7 +61,7 @@ my_imap.login(conf.MY_ACCOUNT, conf.MY_PASS)
 # Mailbox is selected here
 my_imap.select(conf.MY_MAILBOX)
 
-# get mail UIDs
+# Get mail UIDs
 get_mail_uids(my_imap)
 
 
@@ -90,7 +71,7 @@ if not mail_uids_list:
     exit()
 
 else:
-    # retrieve raw emails for each uid and append to retrieved_raw_mails
+    # Retrieve raw emails for each uid and append to retrieved_raw_mails
     for uid in mail_uids_list:
         result, data = my_imap.uid('fetch', uid, '(RFC822)')
         raw_email = data[0][1]
@@ -101,9 +82,9 @@ else:
     my_imap.close()
     my_imap.logout()
 
-    for mail in processed_mails:
-        stripchars(mail)
-
+    # for mail in processed_mails:
+    #    print(mail['TO'])
+    # strip_chars(mail)
     mysqlinserts.mysqlinserts(processed_mails)
 
 exit()

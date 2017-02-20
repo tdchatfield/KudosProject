@@ -24,6 +24,7 @@ def mysqlinserts(processed_mails):
                 ''', vals_to_insert)
             dbconn.commit()
             print("record commited!")
+
         cursor.callproc("kpoint_insert")
         cursor.execute("TRUNCATE `cl45-django`.`kudos_staging`")
         dbconn.close()
