@@ -1,9 +1,10 @@
 import imaplib
 import email
-
+import re
 import mysqlinserts
 import configfile as conf
-import re
+
+from send_alert import alert_failed_award
 
 ADDR_PATTERN = re.compile('<(.*?)>')
 # Creating lists
@@ -11,6 +12,8 @@ mail_uids_list = []
 retrieved_raw_mails = []
 processed_mails = []
 
+def reject_awward(sender):
+    msg = EmailMessage()
 
 def get_mail_uids(my_imap):
     """This function retrieves emails from selected mailbox
@@ -39,6 +42,9 @@ def process_mails():
         mail_cc = mail_unprocessed.get('Cc', "")
         mail_to = mail_unprocessed.get('To', "")
         mail_subj = mail_unprocessed['SUBJECT']
+
+        if not mail_subj.strip():
+            alert_failed_award(mail_from)
 
         for part in mail_unprocessed.walk():
             if part.get_content_type() == 'text/plain':
