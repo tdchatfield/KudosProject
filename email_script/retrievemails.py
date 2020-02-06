@@ -3,7 +3,9 @@ import email
 
 import mysqlinserts
 import configfile as conf
+import re
 
+ADDR_PATTERN = re.compile('<(.*?)>')
 # Creating lists
 mail_uids_list = []
 retrieved_raw_mails = []
@@ -31,22 +33,28 @@ def process_mails():
     in a dictionary if certain criteria are met.
     """
     for mail_unprocessed in retrieved_raw_mails:
-
         mail_unprocessed = email.message_from_bytes(mail_unprocessed)
-
         mail_from = mail_unprocessed['FROM']
         mail_date = mail_unprocessed['DATE']
-        mail_cc = mail_unprocessed['CC']
+        mail_cc = mail_unprocessed.get('Cc', "")
+        mail_to = mail_unprocessed.get('To', "")
+        mail_subj = mail_unprocessed['SUBJECT']
 
         for part in mail_unprocessed.walk():
             if part.get_content_type() == 'text/plain':
                 mail_body = part.get_payload()
 
-        if mail_cc:
+        recips = []
+        rlist = re.findall(ADDR_PATTERN, mail_cc)
+        to_list = re.findall(ADDR_PATTERN, mail_to)
+        recips.extend(rlist)
+        recips.extend(to_list)
+
+        for recip in recips:
             mail = {
                 'FROM': mail_from,
-                'REASON': mail_body,
-                'TO': mail_cc,
+                'REASON': mail_subj.encode(encoding='UTF-8', errors='ignore'),
+                'TO': recip,
                 'DATE': mail_date
             }
 
@@ -55,7 +63,7 @@ def process_mails():
 
 # IMAP connection is defined and established here
 
-my_imap = imaplib.IMAP4_SSL('imap.gmail.com')
+my_imap = imaplib.IMAP4_SSL('outlook.office365.com')
 my_imap.login(conf.MY_ACCOUNT, conf.MY_PASS)
 
 # Mailbox is selected here
@@ -82,9 +90,7 @@ else:
     my_imap.close()
     my_imap.logout()
 
-    # for mail in processed_mails:
-    #    print(mail['TO'])
-    # strip_chars(mail)
     mysqlinserts.mysqlinserts(processed_mails)
 
 exit()
+
