@@ -46,25 +46,26 @@ def process_mails():
         if not mail_subj.strip():
             alert_failed_award(mail_from)
 
-        for part in mail_unprocessed.walk():
-            if part.get_content_type() == 'text/plain':
-                mail_body = part.get_payload()
+        else:
+            for part in mail_unprocessed.walk():
+                if part.get_content_type() == 'text/plain':
+                    mail_body = part.get_payload()
 
-        recips = []
-        rlist = re.findall(ADDR_PATTERN, mail_cc)
-        to_list = re.findall(ADDR_PATTERN, mail_to)
-        recips.extend(rlist)
-        recips.extend(to_list)
+            recips = []
+            rlist = re.findall(ADDR_PATTERN, mail_cc)
+            to_list = re.findall(ADDR_PATTERN, mail_to)
+            recips.extend(rlist)
+            recips.extend(to_list)
 
-        for recip in recips:
-            mail = {
-                'FROM': mail_from,
-                'REASON': mail_subj.encode(encoding='UTF-8', errors='ignore'),
-                'TO': recip,
-                'DATE': mail_date
-            }
+            for recip in recips:
+                mail = {
+                    'FROM': mail_from,
+                    'REASON': mail_subj.encode(encoding='UTF-8', errors='ignore'),
+                    'TO': recip,
+                    'DATE': mail_date
+                }
 
-            processed_mails.append(mail)
+                processed_mails.append(mail)
 
 
 # IMAP connection is defined and established here
