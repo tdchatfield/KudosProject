@@ -15,8 +15,12 @@ def mysqlinserts(processed_mails):
 
         for mail in processed_mails:
 
-            vals_to_insert = mail['FROM'], mail[
-                'TO'], mail['REASON'], mail['DATE']
+            vals_to_insert = (
+                mail['FROM'],
+                mail['TO'],
+                mail['REASON'],
+                mail['DATE']
+            )
 
             cursor.execute('''INSERT INTO kudos_staging
                 (kudos_from, kudos_to, kudos_reason, kudos_date)
